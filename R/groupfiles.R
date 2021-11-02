@@ -24,7 +24,7 @@ group.files <- function(ImageFolder, rename = TRUE) {
     print("This is going to take a little while, the files are being renamed right now")
     file.rename(file.path(ImageFolder, MyFiles), file.path(ImageFolder, RenamedFiles))
     MyFiles <- list.files(ImageFolder)
-    Data <- Data[order(NewFile),]
+    Data <- Data[order(Data$NewFile),]
     print("Okay, files have finished renaming! Now time to make folders for them.")
   }
 
