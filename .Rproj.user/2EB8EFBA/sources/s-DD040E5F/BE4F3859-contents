@@ -16,8 +16,8 @@ group.files <- function(ImageFolder, rename = TRUE) {
   Data <- dplyr::select(Data, File, Run, Plate, Month, Day, Hour, Minute, Second)
   Data <- dplyr::mutate(Data, NewFile = stringr::str_replace(File, paste("^\\S*", Data$Plate, sep = ""), Data$Plate))
 
-  UniquePlates <- distinct(Data, Plate) #Work out what wells you have photos for
-  Wells <- UniquePlates$Plate #Turn this into a list
+  UniquePlates <- distinct(Data, Plate)
+  Wells <- UniquePlates$Plate
 
   if (rename == TRUE){
     RenamedFiles <- Data$NewFile
@@ -43,4 +43,3 @@ group.files <- function(ImageFolder, rename = TRUE) {
   print("All done!")
 }
 
-group.files("Images/Tahlia starvation3", rename = T)
