@@ -1,6 +1,9 @@
-group.files <- function(ImageFolder, rename = TRUE) {
+group.files <- function(ImageFolder, rename = TRUE, savefile = filename) {
 
   MyFiles <- list.files(ImageFolder)
+  if (identical(MyFiles, character(0))){
+    stop("Images not found, make sure you point to your folder with images")
+  }
   Files <- as.data.frame(MyFiles)
   Files <- dplyr::rename(Files, File = MyFiles)
   temp <- as.data.frame(stringr::str_split_fixed(MyFiles, "_", 2))
@@ -15,10 +18,8 @@ group.files <- function(ImageFolder, rename = TRUE) {
   Data <- dplyr::rename(Data, Month = Time_1, Day = Time_2, Hour = Time_3, Minute = Time_4, Second = Time_5)
   Data <- dplyr::select(Data, File, Run, Plate, Month, Day, Hour, Minute, Second)
   Data <- dplyr::mutate(Data, NewFile = stringr::str_replace(File, paste("^\\S*", Data$Plate, sep = ""), Data$Plate))
-
   UniquePlates <- dplyr::distinct(Data, Plate)
   Wells <- UniquePlates$Plate
-
   if (rename == TRUE){
     RenamedFiles <- Data$NewFile
     print("This is going to take a little while, the files are being renamed right now")
@@ -27,7 +28,6 @@ group.files <- function(ImageFolder, rename = TRUE) {
     Data <- Data[order(Data$NewFile),]
     print("Okay, files have finished renaming! Now time to make folders for them.")
   }
-
   wd <- getwd()
   folder <- "GroupedImages"
   for (i in 1:length(Wells)) {
@@ -36,8 +36,8 @@ group.files <- function(ImageFolder, rename = TRUE) {
       dir.create(file.path(wd, folder, newfolder), recursive = TRUE)
     }
   }
-  print("Yay! Folders have been made. Now Going to save the Image data as ImageData.csv")
-  write.csv(Data, "ImageData.csv")
+  print("Yay! Folders have been made. Now Going to save the Image data as DataInfo[Your folder].csv")
+  write.csv(Data, paste0("DataInfo", stringr::str_replace(ImageFolder, paste("^\\S*", "/", sep = ""), ""), ".csv"))
   print("Time to move the images. This is going to take some time!")
   filesstrings::file.move(file.path(ImageFolder, MyFiles), file.path(folder, Data$Plate))
   print("All done!")
